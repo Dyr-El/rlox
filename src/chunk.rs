@@ -13,6 +13,7 @@ impl std::fmt::Display for Byte {
 
 pub enum OpCode {
     OpConstant,
+    OpConstantLong,
     OpReturn,
 }
 
@@ -39,9 +40,11 @@ impl TryFrom<Byte> for OpCode {
 
     fn try_from(byte: Byte) -> Result<Self, Self::Error> {
         const OP_CONSTANT_BYTE: Byte = Byte(OpCode::OpConstant as u8);
+        const OP_CONSTANT_LONG_BYTE: Byte = Byte(OpCode::OpConstantLong as u8);
         const OP_RETURN_BYTE: Byte = Byte(OpCode::OpReturn as u8);
         match byte {
             OP_CONSTANT_BYTE => Ok(OpCode::OpConstant),
+            OP_CONSTANT_LONG_BYTE => Ok(OpCode::OpConstantLong),
             OP_RETURN_BYTE => Ok(OpCode::OpReturn),
             _ => Err(()),
         }
@@ -73,6 +76,18 @@ impl Chunk {
             self.lines.push((line, self.code.len()))
         }
     }
+    pub fn write_const(&mut self, value: Value, line: usize) {
+        let idx = self.add_constant(value);
+        if idx > 255 {
+            self.write_code(Byte::from(OpCode::OpConstantLong), line);
+            self.write_code(Byte::from((idx >> 16) & 0xFF), line);
+            self.write_code(Byte::from((idx >> 8) & 0xFF), line);
+            self.write_code(Byte::from(idx & 0xFF), line);
+        } else {
+            self.write_code(Byte::from(OpCode::OpConstant), line);
+            self.write_code(Byte::from(idx & 0xFF), line);
+        }
+    }
     pub fn code_size(&self) -> usize {
         self.code.len()
     }
@@ -87,7 +102,7 @@ impl Chunk {
         }
         0
     }
-    pub fn add_constant(&mut self, value: Value) -> usize {
+    fn add_constant(&mut self, value: Value) -> usize {
         self.values.push(value);
         self.values.len() - 1
     }

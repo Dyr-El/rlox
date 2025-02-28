@@ -6,12 +6,10 @@ mod values;
 
 pub fn run() -> ExitCode {
     let mut chunk = crate::chunk::Chunk::new();
-    let constant = chunk.add_constant(values::Value::from(1.2));
-    chunk.write_code(chunk::Byte::from(chunk::OpCode::OpReturn), 122);
-    chunk.write_code(chunk::Byte::from(chunk::OpCode::OpReturn), 122);
-    chunk.write_code(chunk::Byte::from(chunk::OpCode::OpConstant), 123);
-    chunk.write_code(chunk::Byte::from(constant), 123);
-    chunk.write_code(chunk::Byte::from(chunk::OpCode::OpReturn), 123);
+    for idx in 1..1000 {
+        chunk.write_const(values::Value::from((idx as f64) / 4.0), idx / 4);
+    }
+    chunk.write_code(chunk::Byte::from(chunk::OpCode::OpReturn), 255);
     disassembler::dump_chunk(&chunk, "test chunk");
     ExitCode::SUCCESS
 }
