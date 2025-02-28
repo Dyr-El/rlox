@@ -2,7 +2,7 @@ use std::usize;
 
 use crate::values::Value;
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 pub struct Byte(u8);
 
 impl std::fmt::Display for Byte {
@@ -51,6 +51,7 @@ impl TryFrom<Byte> for OpCode {
 pub struct Chunk {
     code: Vec<Byte>,
     values: Vec<Value>,
+    lines: Vec<(usize, usize)>,
 }
 
 impl Chunk {
@@ -58,16 +59,33 @@ impl Chunk {
         Chunk {
             code: vec![],
             values: vec![],
+            lines: vec![],
         }
     }
-    pub fn write_code(&mut self, byte: Byte) {
+    pub fn write_code(&mut self, byte: Byte, line: usize) {
         self.code.push(byte);
+        if let Some(last_line) = self.lines.last() {
+            if last_line.0 == line {
+                self.lines.pop();
+            }
+            self.lines.push((line, self.code.len()))
+        } else {
+            self.lines.push((line, self.code.len()))
+        }
     }
     pub fn code_size(&self) -> usize {
         self.code.len()
     }
     pub fn read_code(&self, idx: usize) -> Byte {
         self.code[idx]
+    }
+    pub fn read_line(&self, idx: usize) -> usize {
+        for (line, code_idx) in &self.lines {
+            if idx < *code_idx {
+                return *line;
+            }
+        }
+        0
     }
     pub fn add_constant(&mut self, value: Value) -> usize {
         self.values.push(value);

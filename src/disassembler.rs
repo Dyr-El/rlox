@@ -10,6 +10,11 @@ pub fn dump_chunk(chunk: &chunk::Chunk, name: &str) {
 
 fn dump_instruction(chunk: &chunk::Chunk, offset: usize) -> usize {
     print!("{:04} ", offset);
+    if offset > 0 && chunk.read_line(offset) == chunk.read_line(offset - 1) {
+        print!("   | ");
+    } else {
+        print!("{:4} ", chunk.read_line(offset))
+    }
     let instr_code = chunk.read_code(offset);
     if let Ok(instr) = chunk::OpCode::try_from(instr_code) {
         match instr {
