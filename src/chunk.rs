@@ -14,6 +14,15 @@ impl std::fmt::Display for Byte {
 pub enum OpCode {
     OpConstant,
     OpConstantLong,
+    OpNil,
+    OpTrue,
+    OpFalse,
+    OpNegate,
+    OpAdd,
+    OpSubtract,
+    OpMultiply,
+    OpDivide,
+    OpNot,
     OpReturn,
 }
 
@@ -41,11 +50,29 @@ impl TryFrom<Byte> for OpCode {
     fn try_from(byte: Byte) -> Result<Self, Self::Error> {
         const OP_CONSTANT_BYTE: Byte = Byte(OpCode::OpConstant as u8);
         const OP_CONSTANT_LONG_BYTE: Byte = Byte(OpCode::OpConstantLong as u8);
+        const OP_NIL_BYTE: Byte = Byte(OpCode::OpNil as u8);
+        const OP_TRUE_BYTE: Byte = Byte(OpCode::OpTrue as u8);
+        const OP_FALSE_BYTE: Byte = Byte(OpCode::OpFalse as u8);
+        const OP_NEGATE_BYTE: Byte = Byte(OpCode::OpNegate as u8);
+        const OP_ADD_BYTE: Byte = Byte(OpCode::OpAdd as u8);
+        const OP_SUBTRACT_BYTE: Byte = Byte(OpCode::OpSubtract as u8);
+        const OP_MULTIPLY_BYTE: Byte = Byte(OpCode::OpMultiply as u8);
+        const OP_DIVIDE_BYTE: Byte = Byte(OpCode::OpDivide as u8);
         const OP_RETURN_BYTE: Byte = Byte(OpCode::OpReturn as u8);
+        const OP_NOT_BYTE: Byte = Byte(OpCode::OpNot as u8);
         match byte {
             OP_CONSTANT_BYTE => Ok(OpCode::OpConstant),
             OP_CONSTANT_LONG_BYTE => Ok(OpCode::OpConstantLong),
+            OP_NIL_BYTE => Ok(OpCode::OpNil),
+            OP_TRUE_BYTE => Ok(OpCode::OpTrue),
+            OP_FALSE_BYTE => Ok(OpCode::OpFalse),
+            OP_NEGATE_BYTE => Ok(OpCode::OpNegate),
+            OP_ADD_BYTE => Ok(OpCode::OpAdd),
+            OP_SUBTRACT_BYTE => Ok(OpCode::OpSubtract),
+            OP_MULTIPLY_BYTE => Ok(OpCode::OpMultiply),
+            OP_DIVIDE_BYTE => Ok(OpCode::OpDivide),
             OP_RETURN_BYTE => Ok(OpCode::OpReturn),
+            OP_NOT_BYTE => Ok(OpCode::OpNot),
             _ => Err(()),
         }
     }
@@ -88,6 +115,7 @@ impl Chunk {
             self.write_code(Byte::from(idx & 0xFF), line);
         }
     }
+    #[cfg(any(feature = "dumpChunk"))]
     pub fn code_size(&self) -> usize {
         self.code.len()
     }
