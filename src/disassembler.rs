@@ -35,6 +35,9 @@ pub fn dump_instruction(chunk: &chunk::Chunk, offset: usize) -> usize {
             chunk::OpCode::OpTrue => dump_simple_instr("OP_TRUE", offset),
             chunk::OpCode::OpFalse => dump_simple_instr("OP_FALSE", offset),
             chunk::OpCode::OpNot => dump_simple_instr("OP_NOT", offset),
+            chunk::OpCode::OpEqual => dump_simple_instr("OP_EQUAL", offset),
+            chunk::OpCode::OpGreater => dump_simple_instr("OP_GREATER", offset),
+            chunk::OpCode::OpLess => dump_simple_instr("OP_LESS", offset),
         }
     } else {
         println!("Unknown opcode {}", instr_code);

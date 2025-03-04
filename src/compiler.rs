@@ -6,6 +6,8 @@ use crate::scanner::Token;
 use crate::scanner::TokenType;
 use crate::values::Value;
 use crate::virtual_machine::InterpretError;
+#[cfg(any(feature = "dumpChunk"))]
+use crate::disassembler;
 
 pub struct Parser {
     current: Token,
@@ -78,6 +80,12 @@ impl Parser {
             TokenType::Minus => self.emit_byte(chunk, Byte::from(OpCode::OpSubtract)),
             TokenType::Star => self.emit_byte(chunk, Byte::from(OpCode::OpMultiply)),
             TokenType::Slash => self.emit_byte(chunk, Byte::from(OpCode::OpDivide)),
+            TokenType::BangEqual => self.emit_bytes(chunk, Byte::from(OpCode::OpEqual), Byte::from(OpCode::OpNot)),
+            TokenType::EqualEqual => self.emit_byte(chunk, Byte::from(OpCode::OpEqual)),
+            TokenType::Greater => self.emit_byte(chunk, Byte::from(OpCode::OpGreater)),
+            TokenType::GreateEqual => self.emit_bytes(chunk, Byte::from(OpCode::OpLess), Byte::from(OpCode::OpNot)),
+            TokenType::Less => self.emit_byte(chunk, Byte::from(OpCode::OpLess)),
+            TokenType::LessEqual => self.emit_bytes(chunk, Byte::from(OpCode::OpGreater), Byte::from(OpCode::OpNot)),
             _ => {}
         }
     }
@@ -87,6 +95,12 @@ impl Parser {
             TokenType::Plus => Precedence::Term,
             TokenType::Slash => Precedence::Factor,
             TokenType::Star => Precedence::Factor,
+            TokenType::BangEqual => Precedence::Equality,
+            TokenType::EqualEqual => Precedence::Equality,
+            TokenType::Greater => Precedence::Comparison,
+            TokenType::GreateEqual => Precedence::Comparison,
+            TokenType::Less => Precedence::Comparison,
+            TokenType::LessEqual => Precedence::Comparison,
             _ => Precedence::None,
         }
     }
@@ -109,6 +123,12 @@ impl Parser {
             TokenType::Plus => self.binary(scanner, chunk),
             TokenType::Slash => self.binary(scanner, chunk),
             TokenType::Star => self.binary(scanner, chunk),
+            TokenType::BangEqual => self.binary(scanner, chunk),
+            TokenType::EqualEqual => self.binary(scanner, chunk),
+            TokenType::Greater => self.binary(scanner, chunk),
+            TokenType::GreateEqual => self.binary(scanner, chunk),
+            TokenType::Less => self.binary(scanner, chunk),
+            TokenType::LessEqual => self.binary(scanner, chunk),
             _ => return false,
         }
         true

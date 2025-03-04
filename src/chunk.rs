@@ -23,6 +23,9 @@ pub enum OpCode {
     OpMultiply,
     OpDivide,
     OpNot,
+    OpEqual,
+    OpGreater,
+    OpLess,
     OpReturn,
 }
 
@@ -60,6 +63,9 @@ impl TryFrom<Byte> for OpCode {
         const OP_DIVIDE_BYTE: Byte = Byte(OpCode::OpDivide as u8);
         const OP_RETURN_BYTE: Byte = Byte(OpCode::OpReturn as u8);
         const OP_NOT_BYTE: Byte = Byte(OpCode::OpNot as u8);
+        const OP_EQUAL_BYTE: Byte = Byte(OpCode::OpEqual as u8);
+        const OP_GREATER_BYTE: Byte = Byte(OpCode::OpGreater as u8);
+        const OP_LESS_BYTE: Byte = Byte(OpCode::OpLess as u8);
         match byte {
             OP_CONSTANT_BYTE => Ok(OpCode::OpConstant),
             OP_CONSTANT_LONG_BYTE => Ok(OpCode::OpConstantLong),
@@ -73,6 +79,9 @@ impl TryFrom<Byte> for OpCode {
             OP_DIVIDE_BYTE => Ok(OpCode::OpDivide),
             OP_RETURN_BYTE => Ok(OpCode::OpReturn),
             OP_NOT_BYTE => Ok(OpCode::OpNot),
+            OP_EQUAL_BYTE => Ok(OpCode::OpEqual),
+            OP_GREATER_BYTE => Ok(OpCode::OpGreater),
+            OP_LESS_BYTE => Ok(OpCode::OpLess),
             _ => Err(()),
         }
     }

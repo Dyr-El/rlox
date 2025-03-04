@@ -64,9 +64,38 @@ impl VM {
                     chunk::OpCode::OpTrue => self.execute_true(chunk)?,
                     chunk::OpCode::OpFalse => self.execute_false(chunk)?,
                     chunk::OpCode::OpNot => self.execute_not(chunk)?,
+                    chunk::OpCode::OpEqual => self.execute_equal(chunk)?,
+                    chunk::OpCode::OpLess => self.execute_less(chunk)?,
+                    chunk::OpCode::OpGreater => self.execute_greater(chunk)?,
                 }    
             }
         }
+    }
+    fn execute_less(&mut self, chunk: &chunk::Chunk) -> Result<(), InterpretError> {
+        let b = self.pop()?;
+        let a = self.pop()?;
+        if !a.is_number() || !b.is_number() {
+            self.runtime_error(chunk, "Operand must be a number.");
+            return Err(InterpretError::RuntimeError);            
+        }
+        self.push(values::Value::create_boolean(a.is_less_than(&b)))?;
+        Ok(())
+    }
+    fn execute_greater(&mut self, chunk: &chunk::Chunk) -> Result<(), InterpretError> {
+        let b = self.pop()?;
+        let a = self.pop()?;
+        if !a.is_number() || !b.is_number() {
+            self.runtime_error(chunk, "Operand must be a number.");
+            return Err(InterpretError::RuntimeError);            
+        }
+        self.push(values::Value::create_boolean(a.is_greater_than(&b)))?;
+        Ok(())
+    }
+    fn execute_equal(&mut self, _chunk: &chunk::Chunk) -> Result<(), InterpretError> {
+        let b = self.pop()?;
+        let a = self.pop()?;
+        self.push(values::Value::create_boolean(a.is_equal_to(&b)))?;
+        Ok(())
     }
     fn execute_not(&mut self, _chunk: &chunk::Chunk) -> Result<(), InterpretError> {
         let value = self.pop()?.is_falsey();

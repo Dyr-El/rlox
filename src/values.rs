@@ -71,6 +71,53 @@ impl Value {
     pub fn is_falsey(&self) -> bool {
         self.is_nil() || (self.is_boolean() && !self.try_as_boolean().unwrap_or(false))
     }
+    pub fn is_equal_to(&self, rhs: &Value) -> bool {
+        match self {
+            Value::Number(f1) => {
+                if let Ok(f2) = rhs.try_as_number() {
+                    *f1 == f2
+                } else {
+                    false
+                }
+            },
+            Value::Boolean(b1) => {
+                if let Ok(b2) = rhs.try_as_boolean() {
+                    *b1 == b2
+                } else {
+                    false
+                }
+            },
+            Value::Nil => {
+                if let Value::Nil = rhs {
+                    true
+                } else {
+                    false
+                }
+            },
+        }
+    }
+    pub fn is_greater_than(&self, rhs: &Value) -> bool {
+        if let Ok(v1) = self.try_as_number() {
+            if let Ok(v2) = rhs.try_as_number() {
+                v1 > v2
+            } else {
+                false
+            }
+        } else {
+            false
+        }        
+    }
+    pub fn is_less_than(&self, rhs: &Value) -> bool {
+        if let Ok(v1) = self.try_as_number() {
+            if let Ok(v2) = rhs.try_as_number() {
+                v1 < v2
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
 }
 
 impl ops::Neg for Value {
